@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <style>
+    .task-second_form {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 16px;
+    }
+
+    .form_radio,
+    .form_checkBox,
+    .form_manufacturer,
+    .form_sale {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+  <div class="task-second">
+    <form class="task-second_form" action="sliv.php"></form>
+    <div class="form_radio">
+      <p><b>Size</b></p>
+      <p><input type="radio" id="size_L" name="size" value="L">L</p>
+      <p><input type="radio" id="size_M" name="size" value="M">M</p>
+      <p><input type="radio" id="size_S" name="size" value="S">S</p>
+
+    </div>
+    <div class="form_checkBox">
+      <h4>Color</h4>
+      <p><input type="checkbox" id='color1' name='color' value="1">1</p>
+      <p><input type="checkbox" id='color2' name='color' value="2">2</p>
+      <p><input type="checkbox" id='color3' name='color' value="3">3</p>
+      <p><input type="checkbox" id='color4' name='color' value="4">4</p>
+      <p><input type="checkbox" id='color5' name='color' value="5">5</p>
+    </div>
+    <div class="form_manufacturer">
+      <h4>Manufactura</h4>
+      <p></p><select multiple="multiple" name="manufacturer" id="manufacturer">
+        <option>aaa</option>
+        <option>b&c</option>
+        <option>ddd</option>
+        <option>eee</option>
+      </select></p>
+    </div>
+    <div class="form_sale">
+      <p><input type="checkbox" name="sale" value="распродажа">распродажа</p>
+    </div>
+    </form>
+  </div>
+
+  <script>
+    const url = new URL("http://secondtask/filter?size=M&color=1&color=2&manufacturer=aaa&manufacturer=ddd")
+    let search = url.search.slice(1)
+    const parametr = search.split("&")
+    parametr.forEach((it, index) => {
+      let arr = it.split("=")
+      const element = document.querySelectorAll(`[name='${arr[0]}']`)
+
+      element.forEach(it => {
+        console.log(it.constructor)
+        if (it.constructor === HTMLSelectElement) {
+          console.log(it.length)
+          for (let i = 0; i < it.length; i += 1) {
+            if (arr.indexOf(it[i].value) > -1) {
+              it[i].setAttribute("selected", true)
+            }
+          }
+
+        } else if (it.constructor === HTMLInputElement) {
+          if (arr.indexOf(it.value) > -1) {
+            it.setAttribute("checked", true)
+          }
+        }
+      })
+
+    })
+
+    addEventListener("input", (e) => {
+      console.log(e.target.checked)
+      const el = `${e.target.name}=${e.target.value}`
+      if (e.target.constructor === HTMLSelectElement) {
+
+        let options = e.target.selectedOptions
+        let elements = ""
+        for (let i = 0; i < options.length; i += 1) {
+          elements += `${i === 0 ? "" : "&"}${e.target.name}=${options[i].value}`
+
+
+        }
+        const findElementOption = search.indexOf(e.target.name)
+        search = `${search.slice(0, findElementOption < 0 ? search.length : findElementOption)}${elements}`
+      } else {
+        if (e.target.checked) {
+
+
+          if (e.target.type === "checkbox") {
+            const lastElement = search.lastIndexOf(`${e.target.name}`) + el.length
+            search = `${search.slice(0, lastElement + 1)}${el}${search.slice(lastElement)}`
+
+
+          } else {
+            const findElementRadio = search.indexOf(`${e.target.name}`)
+            search = `${search.slice(0, findElementRadio)}${el}${search.slice(findElementRadio + el.length)}`
+
+          }
+
+        } else {
+          const lastElementFalse = search.lastIndexOf(`${el}`)
+          search = `${search.slice(0, lastElementFalse)}${search.slice(lastElementFalse + el.length + 1)}`
+        }
+      }
+      let changeUrl = `${url.origin}${url.pathname}?${search}`
+      console.log(changeUrl)
+    })
+  </script>
+</body>
+
+</html>

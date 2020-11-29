@@ -1,0 +1,136 @@
+<style>
+  .iframeTwo {
+    width: 800px;
+    height: 200px;
+    border: none;
+
+  }
+   .form {
+      display: flex;
+      justify-content: space-around;
+      flex-direction: row;
+      align-items: center;
+
+    }
+
+    .form_changeLocal {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .rezult-response{
+      width: 20%;
+      border: 1px solid black;
+      font-size: 16px;
+      font-family:Georgia, 'Times New Roman', Times, serif;
+    }
+</style>
+
+<body>
+ <iframe id="frameTwo" class="iframeTwo" src="./forthtaskDomeinTwo.html">
+   <p>Ваш браузер слишком стар</p>
+  </iframe>
+  <div class="form">
+    <div class="form_changeLocal" id="setForm">
+      <legend> Set date</legend>
+      <p><label>key</label><input type="text" name="keySet" required placeholder="Введите ключ"></p>
+      <p><label>value</label><input type="text" name="valueSet" required placeholder="Введите значение ключа "></p>
+      <p><input type="submit" value="Set Date" id="btn_Set"></p>
+    </div>
+    <div class="form_changeLocal" id="deleteForm">
+      <legend> Delete date</legend>
+      <p><label>key</label><input type="text" name="keyDel" required placeholder="Введите ключ"></p>
+      <p><input type="submit" value="Delete" id="btn_Del"></p>
+    </div>
+
+    <div class="form_changeLocal" id="getForm">
+      <legend> Get date</legend>
+      <p><label>Key</label><input type="text" name="keyGet" required placeholder="Введите ключ"></p>
+      <p><input type="submit" value="Get" id="btn_Get"></p>
+      <div id="text"></div>
+    </div>
+
+  </div>
+
+</body>
+<script>
+  const iframe = document.querySelector('.iframeTwo');
+    iframe.onload = function () {
+      console.log("iframe загрузился");
+    }
+    iframe.onerror = function () {
+      console.log("Что-то пошло не так, давай, ищи ошибку!");
+    }
+  // var frameTwo = window.open("forthtaskDomeinTwo.html")
+  // const content = iframe.contentWindow.document
+  // const set = frameTwo.querySelector("#setForm")
+  document.querySelector("#setForm").querySelector("#btn_Set").addEventListener("click", (e) => {
+      e.preventDefault()
+      let key = document.querySelector("[name=keySet]").value
+      let value = document.querySelector("[name=valueSet]").value
+      if (key && value) {
+        // localStorage.setItem(key, value)
+        // console.log(`written data  key ${key} value ${value}`)
+          iframe.contentWindow.postMessage({
+          "method": "set",
+          "key": key,
+          "value": value
+        }, "*")
+        console.log(`written key ${key} value ${value}` )
+
+      } else {
+        console.log("Вы ввели не все данные ")
+      }
+
+
+    })
+
+    document.querySelector("#getForm").querySelector("#btn_Get").addEventListener("click", (e) => {
+      e.preventDefault()
+      let key = document.querySelector("[name=keyGet]").value
+       iframe.contentWindow.postMessage({
+        "method": "get",
+        "key": key,
+      }, "*")
+      window.onmessage = function (e) {
+        e.data.value? console.log(`key ${key} value ${e.data.value}`): console.log("Ключ ${key} отсутсвтует в localStorage DomainTwo ")
+      }
+    })
+
+    document.querySelector("#deleteForm").querySelector("#btn_Del").addEventListener("click", (e) => {
+      e.preventDefault()
+      let key = document.querySelector("[name=keyDel]").value
+      iframe.contentWindow.postMessage({
+        "method": "delete",
+        "key": key,
+      }, "*")
+      window.onmessage = function (e) {
+        e.data.value ? console.log(`removed key ${key} value ${e.data.value}`) : console.log("Ключ ${key} отсутсвтует в localStorage DomainTwo ")
+      }
+    })
+    function messageProcessing(e) {
+      const data = e.data
+      function cb(e) {
+       let  overlay = document.querySelector(".rezult-response")
+        if(overlay) {
+          overlay.innerHTML =""
+        } else {
+           overlay = document.createElement("div")
+        }
+        const text = document.createElement("p")
+        text.innerHTML = `<span>Method: ${e.method}</span><span>Key: ${e.key}<span> <span>Value: ${e.value}</span>`
+        overlay.appendChild(text)
+        overlay.classList.add("rezult-response")
+        document.body.appendChild(overlay)
+      }
+      if(data.value&&data.key) {
+        cb(data)
+      }
+    }
+    window.addEventListener("message", messageProcessing, false);
+
+</script>
+
+
+

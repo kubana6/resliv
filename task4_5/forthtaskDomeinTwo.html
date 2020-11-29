@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <iframe id="frameTwo" class="iframeTwo" src="./forthtaskDomeinOne.html"></iframe>
+  <div> hello you this is the domain.two page iframe
+  </div>
+  <script>
+
+    function messageProcessing(e) {
+
+      const  data = e.data
+      if (data.method === "set") {
+        localStorage.setItem(data.key, data.value)
+         window.top.postMessage({
+          "method": data.method,
+          "value": data.value,
+          "key": data.key,
+        }, "*")
+
+      } else if (data.method === "get") {
+        const value = localStorage.getItem(data.key)
+        window.top.postMessage({
+          "method":"get",
+          "value": value,
+           "key":data.key,
+        }, "*")
+
+
+      } else if (data.method === "delete") {
+        const value = localStorage.getItem(data.key)
+        window.top.postMessage({
+          "method": "delete",
+          "value": value,
+           "key":data.key
+        }, "*")
+        localStorage.removeItem(data.key)
+      }
+    }
+    window.addEventListener("message", messageProcessing, false);
+    </script>
+</body>
+
+</html>

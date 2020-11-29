@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <style>
+    .red {
+      color: red;
+    }
+  </style>
+  <input type="text" name="name" id="name_input" value="Xxxx">
+  <script>
+    const inp = document.querySelector("#name_input")
+    const trueValue = inp.value
+    function checkValue(e) {
+      inp.value != trueValue?inp.classList.add("red"):inp.classList.remove("red")
+    }
+    inp.addEventListener('input', checkValue)
+  </script>
+</body>
+
+</html>
